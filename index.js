@@ -1,6 +1,7 @@
 const inquirer = require('inquirer');
 const fs = require('fs');
 const color = require('color-name');
+const { Circle, Triangle, Square } = require('./lib/shapes')
 //color validator function//
 function validColor(input) {
     const colorName = input.toLowerCase();
@@ -22,7 +23,7 @@ const userInput = [
         message: 'Please select text color.',
         validate: (input) => {
             if (!validColor(input)) {
-                return 'Please enter a valid Color Kayword or Hexadeciaml number.';
+                return 'Please enter a valid Color Keyword or Hexadeciaml number.';
             }
             return true;
         }
@@ -38,7 +39,7 @@ const userInput = [
         message: 'Please choose a shape color',
         validate: (input) => {
             if (!validColor(input)) {
-                return 'Please enter a valid Color Kayword or Hexadeciaml number.';
+                return 'Please enter a valid Color Keyword or Hexadeciaml number.';
             }
             return true;
         }
@@ -46,15 +47,34 @@ const userInput = [
 ];
 
 
-
+//user input answers//
 inquirer.prompt(userInput).then((answers) => {
     const { text, textColor, shape, shapeColor } = answers;
 
-    const svgCode = `<svg width="300" height="200">
-    <rect width="300" height="200" fill="${shapeColor}" />
+    let shapeObject;
+
+    switch (shape) {
+        case 'circle':
+            shapeObject = new Circle();
+            break;
+        case 'triangle':
+            shapeObject = new Triangle();
+            break;
+        case 'square':
+            shapeObject = new Square();
+            break;
+        default:
+            console.log('Invalid shape');
+            return;
+    }
+
+    shapeObject.color = shapeColor;
+    //setting svg rendering code///
+    const svgCode = `<svg version ="1.1" width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+    ${shapeObject.render()}
     <text x="50%" y="50%" text-anchor="middle" fill="${textColor}" font-size="48">${text}</text>
 </svg>`;
-
+    ///writing svg file/////
     fs.writeFile('logo.svg', svgCode, (err) => {
         if (err) {
             console.error(err);
